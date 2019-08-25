@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9EEE7C82-AD18-449D-B5E0-5F6D0C1C3D6F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>PROFridge</RootNamespace>
+    <AssemblyName>PROFridge</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Memory, Version=1.2.18.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Memory.dll.1.2.18.1\lib\net472\Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsInput, Version=1.0.6.0, Culture=neutral, PublicKeyToken=de2685b4776e9c2e, processorArchitecture=MSIL">
+      <HintPath>..\packages\InputSimulatorPlus.1.0.7\lib\net20\WindowsInput.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ViewModel\HelperClasses\KeyboardHook.cs" />
+    <Compile Include="ViewModel\Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewModel\Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ViewModel\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\DataSources\Form1.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspChildControlTypeAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspDataFieldAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspDataFieldsAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMethodPropertyAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcActionAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcActionSelectorAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcAreaAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcAreaMasterLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcAreaPartialViewLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcAreaViewLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcControllerAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcDisplayTemplateAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcEditorTemplateAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcMasterAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcMasterLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcModelTypeAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcPartialViewAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcPartialViewLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcSuppressViewErrorAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcTemplateAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcViewAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcViewComponentAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcViewComponentViewAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspMvcViewLocationFormatAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspRequiredAttributeAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AspTypePropertyAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AssertionConditionAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.AssertionMethodAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.BaseTypeRequiredAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.CanBeNullAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.CannotApplyEqualityOperatorAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.CollectionAccessAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.ContractAnnotationAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.HtmlAttributeValueAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.HtmlElementAttributesAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.InstantHandleAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.InvokerParameterNameAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.ItemCanBeNullAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.ItemNotNullAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.LinqTunnelAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.LocalizationRequiredAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.MacroAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.MeansImplicitUseAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.MustUseReturnValueAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.NoEnumerationAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.NoReorderAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.NotifyPropertyChangedInvocatorAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.NotNullAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.PathReferenceAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.ProvidesContextAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.PublicAPIAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.PureAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorDirectiveAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorHelperCommonAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorImportNamespaceAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorInjectionAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorLayoutAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorPageBaseTypeAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorSectionAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorWriteLiteralMethodAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorWriteMethodAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RazorWriteMethodParameterAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.RegexPatternAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.SourceTemplateAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.StringFormatMethodAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.TerminatesProgramAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.UsedImplicitlyAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.ValueProviderAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.XamlItemBindingOfItemsControlAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Annotations.XamlItemsControlAttribute.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Properties.Resources.datasource" />
+    <None Include="Properties\DataSources\PROFridge.Properties.Settings.datasource" />
+    <None Include="Properties\DataSources\Program.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
+    <Folder Include="View\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
