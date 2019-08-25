@@ -95,11 +95,6 @@ namespace PROFridge
 
             }
 
-            if (chkbx_farmSpecifPoke.Checked)
-            {
-                FarmSpecifPokeID = Int32.Parse(txtbx_farmSpcifPoke.Text);
-            }
-
             if (!chkbx_UseFishRod.Checked)
             {
                 Move();
@@ -167,33 +162,33 @@ namespace PROFridge
             {
                 txtbx_status.Text = Status = "World";
 
-                if (startCoordX < XPos+1)
+                if (startCoordX < XPos+1 && startBot)
                 {
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
                     XPos--;
-                    sim.Keyboard.Sleep(500);
+                    sim.Keyboard.Sleep(300);
                 }
 
-                if (startCoordX > XPos -1)
+                if (startCoordX > XPos -1 && startBot)
                 {
                    
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_D);
                     XPos++;
-                    sim.Keyboard.Sleep(500);
+                    sim.Keyboard.Sleep(300);
                 }
 
             }
 
             if (IsFight != 0 && EncounterPokeIndex != 0)
             {
-                txtbx_status.Text = Status = "Pokemon Encountered";
+                txtbx_status.Text = Status = "Pokemon Encountered: " + EncounterPokeIndex;
 
                 FightLogic();
             }
 
 
 
-            await Task.Delay(500);
+            await Task.Delay(50);
             Move();
         }
 
@@ -212,7 +207,7 @@ namespace PROFridge
 
             if (IsFight != 0 && EncounterPokeIndex != 0)
             {
-                txtbx_status.Text = Status = "Pokemon Encountered";
+                txtbx_status.Text = Status = "Pokemon Encountered: " + EncounterPokeIndex;
 
                 FightLogic();
 
@@ -228,7 +223,7 @@ namespace PROFridge
         // Fight logic
         public void FightLogic()
         {
-            if (IsFight == 7 && AbilityPP1 > 0)
+            if (IsFight == 7) // && AbilityPP1 > 0)
             {
                 txtbx_status.Text = Status = "Lets Fight";
 
@@ -241,11 +236,10 @@ namespace PROFridge
                 {
                     if (EncounterPokeIndex == FarmSpecifPokeID)
                     {
-                        txtbx_status.Text = "Found: " + EncounterPokeIndex;
+                        txtbx_status.Text = "Fighting: " + EncounterPokeIndex;
 
                         // Specific Poke to LOW
-                        txtbx_status.Text = Status = "Fighting";
-
+                        
                         sim.Keyboard.Sleep(1000);
 
                         sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
@@ -310,6 +304,20 @@ namespace PROFridge
             //Console.WriteLine(key.ToString());
             if (key.ToString() == "F5")
             {
+                if (chkbx_farmSpecifPoke.Checked)
+                {
+                    try
+                    {
+                        FarmSpecifPokeID = Int32.Parse(txtbx_farmSpcifPoke.Text);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Please enter in a specific Pokemon ID");
+                        startBot = false;
+                    }
+                    
+                }
+
                 SnapshotCoords();
                 startBot = true;
                 txtbx_status.Text = "Go";
