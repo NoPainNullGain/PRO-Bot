@@ -1,2 +1,2 @@
 # PROFridge
- Pokemon PRO BOT
+ Farming + Leveling bot for the game Pokemon Revolution Online
