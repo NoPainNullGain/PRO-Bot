@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,14 +15,18 @@ using System.Windows.Forms;
 using WindowsInput;
 using WindowsInput.Native;
 using Memory;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PROFridge.Annotations;
+using PROFridge.Properties;
+using PROFridge.ViewModel.HelperClasses;
 
 namespace PROFridge
 {
     public partial class Form1 : Form, INotifyPropertyChanged
     {
 
-        // TODO
+        // TODO 
         
 
 
@@ -53,8 +59,14 @@ namespace PROFridge
         private int _PokeDollars;
         private int _isFight;
 
-        public float startCoordX;
-        public float startCoordY;
+        public float SnapshotCurrentPositionX;
+        public float SnapshotCurrentPositionY;
+        public int coordinateID = 0;
+        public string recordedPathFile = @"C:\Users\Michael Kjergaard\Desktop\dummyFile.txt";
+        public bool FinishedRecording = true;
+
+
+        public List<Coordinates> xy_List = new List<Coordinates>();
 
         public Mem m = new Mem();
 
@@ -87,12 +99,9 @@ namespace PROFridge
             try
             {
                 AbilityPP1 = Int32.Parse(txtbx_abilityPP1.Text);
-
-
             }
             catch (Exception exception)
             {
-
             }
 
             if (!chkbx_UseFishRod.Checked)
@@ -149,10 +158,10 @@ namespace PROFridge
 
         public void SnapshotCoords()
         {
-            startCoordX = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x21C");
+            SnapshotCurrentPositionX = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x21C");
             
-            startCoordY = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
-            
+            SnapshotCurrentPositionY = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
+
         }
 
 
@@ -162,14 +171,14 @@ namespace PROFridge
             {
                 txtbx_status.Text = Status = "World";
 
-                if (startCoordX < XPos+1 && startBot)
+                if (SnapshotCurrentPositionX < XPos+1 && startBot)
                 {
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
                     XPos--;
                     sim.Keyboard.Sleep(300);
                 }
 
-                if (startCoordX > XPos -1 && startBot)
+                if (SnapshotCurrentPositionX > XPos -1 && startBot)
                 {
                    
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_D);
@@ -181,7 +190,7 @@ namespace PROFridge
 
             if (IsFight != 0 && EncounterPokeIndex != 0)
             {
-                txtbx_status.Text = Status = "Pokemon Encountered: " + EncounterPokeIndex;
+                txtbx_status.Text = Status = "Pokemon Encountered: " + EnemyPokemon(EncounterPokeIndex);
 
                 FightLogic();
             }
@@ -207,7 +216,7 @@ namespace PROFridge
 
             if (IsFight != 0 && EncounterPokeIndex != 0)
             {
-                txtbx_status.Text = Status = "Pokemon Encountered: " + EncounterPokeIndex;
+                txtbx_status.Text = Status = "Pokemon Encountered: " + EnemyPokemon(EncounterPokeIndex);
 
                 FightLogic();
 
@@ -223,7 +232,7 @@ namespace PROFridge
         // Fight logic
         public void FightLogic()
         {
-            if (IsFight == 7) // && AbilityPP1 > 0)
+            if (IsFight == 7 && startBot) // && AbilityPP1 > 0)
             {
                 txtbx_status.Text = Status = "Lets Fight";
 
@@ -236,7 +245,7 @@ namespace PROFridge
                 {
                     if (EncounterPokeIndex == FarmSpecifPokeID)
                     {
-                        txtbx_status.Text = "Fighting: " + EncounterPokeIndex;
+                        txtbx_status.Text = "Fighting: " + EnemyPokemon(EncounterPokeIndex);
 
                         // Specific Poke to LOW
                         
@@ -247,13 +256,13 @@ namespace PROFridge
                         sim.Keyboard.Sleep(1000);
 
                         sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
-
+                                
                         AbilityPP1--;
-
+                        
                     }
                     else if (EncounterPokeIndex != FarmSpecifPokeID)
                     {
-                        txtbx_status.Text = "Found wrong Pokemon: " + EncounterPokeIndex + ", LEAVING!";
+                        txtbx_status.Text = "Found wrong Pokemon: " + EnemyPokemon(EncounterPokeIndex) + ", LEAVING!";
 
                         // Leave Logic
                         sim.Keyboard.Sleep(1000);
@@ -266,12 +275,12 @@ namespace PROFridge
                 }
                 else if (EnemyCurrentHealth == 1 && chkbx_farmSpecifPoke.Checked)
                 {
-                    txtbx_status.Text = "Catching Specific Poke: " + EncounterPokeIndex;
-                    // Catch Logic
+                    txtbx_status.Text = "Catching Specific Poke: " + EnemyPokemon(EncounterPokeIndex);
+                    //TODO
                 }
 
 
-
+                
 
 
 
@@ -299,9 +308,14 @@ namespace PROFridge
 
         }
 
+
+        public void NeedHeal()
+        {
+            //TODO
+        }
+
         async void KeyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
         {
-            //Console.WriteLine(key.ToString());
             if (key.ToString() == "F5")
             {
                 if (chkbx_farmSpecifPoke.Checked)
@@ -328,14 +342,69 @@ namespace PROFridge
                 startBot = false;
                 txtbx_status.Text = "Stopped";
             }
+            else if (key.ToString() == "W")
+            {
+                SnapshotCoords();
+                txtbx_status.Text = "Up";
+            }
+            else if (key.ToString() == "S")
+            {
+                SnapshotCoords();
+                txtbx_status.Text = "Down";
+            }
+            else if (key.ToString() == "A")
+            {
+                SnapshotCoords();
+                txtbx_status.Text = "Left";
+            }
+            else if (key.ToString() == "D")
+            {
+                SnapshotCoords();
+                txtbx_status.Text = "Right";
+            }
+        }
+
+
+        public async void RecordPath()
+         {
+            FinishedRecording = false;
             
+            while(!FinishedRecording)
+            {
+                
+                if(XPos != SnapshotCurrentPositionX && YPos != SnapshotCurrentPositionY)
+                { 
+                        var coordinates = new Coordinates
+                        {
+                            Id = ++coordinateID,
+                            CoordX = XPos,
+                            CoordY = YPos
+                        };
+
+
+                        xy_List.Add(coordinates);
+
+                }
+                Debug.WriteLine(components, "Coord Result:");
+            }
+
+
+                
+            string result = JsonConvert.SerializeObject(xy_List, Formatting.Indented);
+
+            using (var writer = new StreamWriter(recordedPathFile))
+            {
+                writer.Write(result);
+                Debug.WriteLine(result, "Result:");
+            }
+
+
+            await Task.Delay(1000);
+
         }
 
 
 
-
-
-        
 
 
         public string EnemyPokemon(int id)
@@ -360,8 +429,50 @@ namespace PROFridge
                     return "";
                 case 9:
                     return "";
+                case 10:
+                    return "";
+                case 11:
+                    return "";
+                case 12:
+                    return "";
+                case 13:
+                    return "";
+                case 14:
+                    return "";
+                case 15:
+                    return "";
+                case 16:
+                    return "";
+                case 17:
+                    return "";
+                case 18:
+                    return "";
+                case 19:
+                    return "Rattata";
+                case 20:
+                    return "";
+                case 21:
+                    return "Spearow";
+                case 22:
+                    return "";
+                case 23:
+                    return "Ekans";
+                case 24:
+                    return "Arbok";
+                case 25:
+                    return "";
+                case 26:
+                    return "";
+                case 27:
+                    return "";
+                case 28:
+                    return "";
+                case 29:
+                    return "";
+                case 30:
+                    return "";
 
-                // In the end ALL pokemon names
+                    // In the end ALL pokemon names
             }
 
             return id.ToString();
@@ -453,9 +564,14 @@ namespace PROFridge
 
         #endregion
 
-        private void txtbx_farmSpcifPoke_TextChanged(object sender, EventArgs e)
+        private void button1_Click_1(object sender, EventArgs e)
         {
+            RecordPath();
+        }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            FinishedRecording = true;
         }
     }
 }
