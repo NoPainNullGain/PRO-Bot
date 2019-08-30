@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WindowsInput;
@@ -25,14 +26,17 @@ namespace PROFridge
 {
     public partial class Form1 : Form, INotifyPropertyChanged
     {
-
-        // TODO 
-        
-
-
         public Form1()
         {
             InitializeComponent();
+
+            coordinates = new Coordinates
+            {
+                Id = -9,
+                CoordX = -9,
+                CoordY = -9
+            };
+
         }
 
         public bool startBot = false;
@@ -64,9 +68,14 @@ namespace PROFridge
         public int coordinateID = 0;
         public string recordedPathFile = @"C:\Users\Michael Kjergaard\Desktop\dummyFile.txt";
         public bool FinishedRecording = true;
+        public bool reversePath = true;
 
 
+
+        public List<Coordinates> ReversedCoordList;
+        public Coordinates coordinates;
         public List<Coordinates> xy_List = new List<Coordinates>();
+        public List<Coordinates> coordListFromJson;
 
         public Mem m = new Mem();
 
@@ -77,22 +86,21 @@ namespace PROFridge
         private void Form1_Load(object sender, EventArgs e)
         {
             KeyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(KeyboardHook_KeyDown);
-            // KeyboardHook.KeyUp += new RamGecTools.KeyboardHook.KeyboardHookCallback(KeyboardHook_KeyUp);
             KeyboardHook.Install();
 
             // Get Process ID
             int pID = m.getProcIDFromName("PROClient");
-            
+
             // check
             openProc = false;
 
-            if (pID > 0) 
+            if (pID > 0)
             {
                 m.OpenProcess(pID);
                 openProc = true;
             }
 
-            
+
             OnTickMemoryRead();
 
 
@@ -106,7 +114,7 @@ namespace PROFridge
 
             if (!chkbx_UseFishRod.Checked)
             {
-                Move();
+                MoveFarming();
             }
 
             if (chkbx_UseFishRod.Checked)
@@ -117,7 +125,7 @@ namespace PROFridge
 
         private void button1_Click(object sender, EventArgs e)
         {
-                        
+
         }
 
         // Continuesly reading memory and updating the UI
@@ -131,7 +139,7 @@ namespace PROFridge
                 EnemyCurrentHealth = m.readInt("GameAssembly.dll+00A42B10,0x50,0x40,0x48,0xB8,0x0,0xA04");
                 txtbx_enemyCurrentHealth.Text = EnemyCurrentHealth.ToString();
 
-                IsFight= m.readInt("GameAssembly.dll+00A68178,0x210,0x528,0x548,0x88,0x768");
+                IsFight = m.readInt("GameAssembly.dll+00A68178,0x210,0x528,0x548,0x88,0x768");
                 txtbx_fightState.Text = IsFight.ToString();
 
                 EncounterPokeIndex = m.readInt("UnityPlayer.dll+014B8980,0x48,0x118,0x138,0x60,0x138,0x9FC");
@@ -139,17 +147,17 @@ namespace PROFridge
 
                 PokeDollars = m.readInt("GameAssembly.dll+00A508B0,0xB8,0x48,0xB8,0x298,0x290");
                 txtbx_pokeDollar.Text = PokeDollars.ToString();
-                
+
                 XPos = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x21C");
                 txtbx_xPos.Text = XPos.ToString();
 
-                YPos= m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
+                YPos = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
                 txtbx_yPos.Text = YPos.ToString();
 
                 txtbx_currentPP1.Text = AbilityPP1.ToString();
 
                 await Task.Delay(10);
-                
+
                 OnTickMemoryRead();
 
             }
@@ -158,29 +166,29 @@ namespace PROFridge
 
         public void SnapshotCoords()
         {
-            SnapshotCurrentPositionX = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x21C");
-            
-            SnapshotCurrentPositionY = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
+            SnapshotCurrentPositionX = XPos;
+
+            SnapshotCurrentPositionY = YPos;
 
         }
 
 
-        public async void Move()
+        public async void MoveFarming()
         {
             if (IsFight == 0 && startBot)
             {
                 txtbx_status.Text = Status = "World";
 
-                if (SnapshotCurrentPositionX < XPos+1 && startBot)
+                if (SnapshotCurrentPositionX < XPos + 1 && startBot)
                 {
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
                     XPos--;
                     sim.Keyboard.Sleep(300);
                 }
 
-                if (SnapshotCurrentPositionX > XPos -1 && startBot)
+                if (SnapshotCurrentPositionX > XPos - 1 && startBot)
                 {
-                   
+
                     sim.Keyboard.KeyPress(VirtualKeyCode.VK_D);
                     XPos++;
                     sim.Keyboard.Sleep(300);
@@ -198,7 +206,7 @@ namespace PROFridge
 
 
             await Task.Delay(50);
-            Move();
+            MoveFarming();
         }
 
         public async void Fishing()
@@ -206,7 +214,7 @@ namespace PROFridge
             if (IsFight == 0)
             {
                 txtbx_status.Text = Status = "World Fishing";
-                
+
 
                 sim.Keyboard.Sleep(500);
 
@@ -238,7 +246,11 @@ namespace PROFridge
 
 
 
-                
+
+
+
+
+
                 // FARMING BOT LOGIC
 
                 if (EnemyCurrentHealth > 1 && chkbx_farmSpecifPoke.Checked)
@@ -248,17 +260,17 @@ namespace PROFridge
                         txtbx_status.Text = "Fighting: " + EnemyPokemon(EncounterPokeIndex);
 
                         // Specific Poke to LOW
-                        
-                        sim.Keyboard.Sleep(1000);
-
-                        sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
 
                         sim.Keyboard.Sleep(1000);
 
                         sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
-                                
+
+                        sim.Keyboard.Sleep(1000);
+
+                        sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
+
                         AbilityPP1--;
-                        
+
                     }
                     else if (EncounterPokeIndex != FarmSpecifPokeID)
                     {
@@ -271,16 +283,20 @@ namespace PROFridge
 
                         sim.Keyboard.Sleep(1000);
                     }
-                    
+
                 }
                 else if (EnemyCurrentHealth == 1 && chkbx_farmSpecifPoke.Checked)
                 {
                     txtbx_status.Text = "Catching Specific Poke: " + EnemyPokemon(EncounterPokeIndex);
-                    //TODO
+                    // TODO
+                    // Catch Mechanic
                 }
 
 
-                
+
+
+
+
 
 
 
@@ -303,16 +319,210 @@ namespace PROFridge
 
                     AbilityPP1--;
                 }
-                
+
             }
 
         }
 
 
-        public void NeedHeal()
+        public void HealPokecenter()
         {
             //TODO
+            LoadPath();
+
+            MoveOnPath();
+
+            // Interact();
+
+            // reversePath = false;
+
+            // MoveOnPath();
         }
+
+        private void Interact()
+        {
+            sim.Keyboard.KeyPress(VirtualKeyCode.RETURN);
+            sim.Keyboard.TextEntry("Interacting!");
+        }
+
+        public async void MoveOnPath()
+        {
+            // TODO
+            if (reversePath)
+            {
+
+                for (int i = 0; i < ReversedCoordList.Count; i++)
+                {
+                    if (i>0 && (ReversedCoordList[i].CoordX > ReversedCoordList[i - 1].CoordX + 3 || ReversedCoordList[i].CoordX < ReversedCoordList[i - 1].CoordX - 3 || ReversedCoordList[i].CoordY > ReversedCoordList[i - 1].CoordY + 3 || ReversedCoordList[i].CoordY < ReversedCoordList[i - 1].CoordY - 3))
+                    {
+                        if (ReversedCoordList[i].CoordX > ReversedCoordList[i - 1].CoordX + 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
+                        }
+
+                        if (ReversedCoordList[i].CoordX < ReversedCoordList[i - 1].CoordX - 3)
+                        {
+                            sim.Keyboard.KeyDown(VirtualKeyCode.VK_D);
+                        }
+
+                        if (ReversedCoordList[i].CoordY > ReversedCoordList[i - 1].CoordY + 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                        }
+
+                        if (ReversedCoordList[i].CoordY < ReversedCoordList[i - 1].CoordY - 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                        }
+
+                        Thread.Sleep(1000);
+
+                    }
+
+
+                    else
+                    {
+                        while (XPos != ReversedCoordList[i].CoordX || YPos != ReversedCoordList[i].CoordY)
+                        {
+
+
+                            while (XPos > ReversedCoordList[i].CoordX)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
+                                await Task.Delay(50);
+                            }
+
+                            while (XPos < ReversedCoordList[i].CoordX)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_D);
+                                await Task.Delay(50);
+                            }
+
+                            while (YPos > ReversedCoordList[i].CoordY)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                                await Task.Delay(50);
+                            }
+
+                            while (YPos < ReversedCoordList[i].CoordY)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                                await Task.Delay(50);
+                            }
+                        }
+                    }
+
+                }
+            }
+            else if (!reversePath)
+            {
+                for (int i = 0; i < coordListFromJson.Count; i++)
+                {
+                    if (i > 0 && (coordListFromJson[i].CoordX > coordListFromJson[i - 1].CoordX + 3 || coordListFromJson[i].CoordX < coordListFromJson[i - 1].CoordX - 3 || coordListFromJson[i].CoordY > coordListFromJson[i - 1].CoordY + 3 || coordListFromJson[i].CoordY < coordListFromJson[i - 1].CoordY - 3))
+                    {
+                        if (coordListFromJson[i].CoordX > coordListFromJson[i - 1].CoordX + 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
+                        }
+
+                        if (coordListFromJson[i].CoordX < coordListFromJson[i - 1].CoordX - 3)
+                        {
+                            sim.Keyboard.KeyDown(VirtualKeyCode.VK_D);
+                        }
+
+                        if (coordListFromJson[i].CoordY > coordListFromJson[i - 1].CoordY + 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                        }
+
+                        if (coordListFromJson[i].CoordY < coordListFromJson[i - 1].CoordY - 3)
+                        {
+                            sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                        }
+
+                        Thread.Sleep(1000);
+
+                    }
+
+
+                    else
+                    {
+                        while (XPos != coordListFromJson[i].CoordX || YPos != coordListFromJson[i].CoordY)
+                        {
+
+
+                            while (XPos > coordListFromJson[i].CoordX)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_A);
+                                await Task.Delay(50);
+                            }
+
+                            while (XPos < coordListFromJson[i].CoordX)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_D);
+                                await Task.Delay(50);
+                            }
+
+                            while (YPos > coordListFromJson[i].CoordY)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                                await Task.Delay(50);
+                            }
+
+                            while (YPos < coordListFromJson[i].CoordY)
+                            {
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                                await Task.Delay(50);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        private void LoadPath()
+        {
+            try
+            {
+                string jsonFromFile;
+                using (var reader = new StreamReader(recordedPathFile))
+                {
+                    jsonFromFile = reader.ReadToEnd();
+                }
+
+                coordListFromJson = JsonConvert.DeserializeObject<List<Coordinates>>(jsonFromFile);
+
+                if (reversePath)
+                {
+                    ReversedCoordList = coordListFromJson;
+                    ReversedCoordList.Reverse();
+                }
+
+
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
+
+
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            LoadPath();
+        }
+
+
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            HealPokecenter();
+        }
+
+
 
         async void KeyboardHook_KeyDown(RamGecTools.KeyboardHook.VKeys key)
         {
@@ -329,7 +539,7 @@ namespace PROFridge
                         MessageBox.Show("Please enter in a specific Pokemon ID");
                         startBot = false;
                     }
-                    
+
                 }
 
                 SnapshotCoords();
@@ -342,69 +552,75 @@ namespace PROFridge
                 startBot = false;
                 txtbx_status.Text = "Stopped";
             }
-            else if (key.ToString() == "W")
+            else if (key.ToString() == "KEY_W")
             {
-                SnapshotCoords();
                 txtbx_status.Text = "Up";
-            }
-            else if (key.ToString() == "S")
-            {
                 SnapshotCoords();
+            }
+            else if (key.ToString() == "KEY_S")
+            {
                 txtbx_status.Text = "Down";
-            }
-            else if (key.ToString() == "A")
-            {
                 SnapshotCoords();
+            }
+            else if (key.ToString() == "KEY_A")
+            {
                 txtbx_status.Text = "Left";
-            }
-            else if (key.ToString() == "D")
-            {
                 SnapshotCoords();
-                txtbx_status.Text = "Right";
             }
+            else if (key.ToString() == "KEY_D")
+            {
+                txtbx_status.Text = "Right";
+                SnapshotCoords();
+            }
+
+            await Task.Delay(100);
         }
 
 
         public async void RecordPath()
-         {
+        {
+            // TODO
+            // Muligvis omkskrive RecordPath til istedet for xy, xy, xy, xy coordinater så x, y, x, y, x, y, x, y
+            // Så der kun optages coords når de ændres og derved danner man en linje botten kan følge
+
+            // Anden mulighed som i nuværende recordPath xy, xy, xy, xy, xy. få botten til kun at følge det coord som ændre sig og derved lave en linge der kan følge. 
+
             FinishedRecording = false;
-            
-            while(!FinishedRecording)
+            SnapshotCoords();
+
+            if (XYList.Count == 0)
             {
-                
-                if(XPos != SnapshotCurrentPositionX && YPos != SnapshotCurrentPositionY)
-                { 
-                        var coordinates = new Coordinates
-                        {
-                            Id = ++coordinateID,
-                            CoordX = XPos,
-                            CoordY = YPos
-                        };
+                coordinates = new Coordinates
+                {
+                    Id = ++coordinateID,
+                    CoordX = XPos,
+                    CoordY = YPos
+                };
+
+                XYList.Add(coordinates);
+                Debug.WriteLine(coordinates, "Adding coords to empty list");
+
+            }
+
+            if (XYList.Last().CoordX != SnapshotCurrentPositionX || XYList.Last().CoordY != SnapshotCurrentPositionY)
+            {
+                coordinates = new Coordinates
+                {
+                    Id = ++coordinateID,
+                    CoordX = XPos,
+                    CoordY = YPos
+                };
+
+                XYList.Add(coordinates);
+                Debug.WriteLine(coordinates, "Adding coords to list");
 
 
-                        xy_List.Add(coordinates);
-
-                }
-                Debug.WriteLine(components, "Coord Result:");
             }
 
 
-                
-            string result = JsonConvert.SerializeObject(xy_List, Formatting.Indented);
-
-            using (var writer = new StreamWriter(recordedPathFile))
-            {
-                writer.Write(result);
-                Debug.WriteLine(result, "Result:");
-            }
-
-
-            await Task.Delay(1000);
-
+            await Task.Delay(100);
+            RecordPath();
         }
-
-
-
 
 
         public string EnemyPokemon(int id)
@@ -472,7 +688,7 @@ namespace PROFridge
                 case 30:
                     return "";
 
-                    // In the end ALL pokemon names
+                    // ALL Pokemons inserted
             }
 
             return id.ToString();
@@ -550,6 +766,12 @@ namespace PROFridge
             set { _farmSpecifPokeID = value; }
         }
 
+        public List<Coordinates> XYList
+        {
+            get { return xy_List; }
+            set { xy_List = value; }
+        }
+
 
         #region OnPropChange
 
@@ -572,6 +794,17 @@ namespace PROFridge
         private void button2_Click(object sender, EventArgs e)
         {
             FinishedRecording = true;
+
+            if (FinishedRecording)
+            {
+                string result = JsonConvert.SerializeObject(XYList, Formatting.Indented);
+
+                using (var writer = new StreamWriter(recordedPathFile))
+                {
+                    writer.Write(result);
+                    Debug.WriteLine(result, "Writing coords to JSON");
+                }
+            }
         }
     }
 }

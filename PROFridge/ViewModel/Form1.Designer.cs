@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.txtbx_currentHealth = new System.Windows.Forms.TextBox();
-            this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtbx_pokemonID = new System.Windows.Forms.TextBox();
@@ -65,6 +64,9 @@
             this.label15 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -76,10 +78,6 @@
             this.txtbx_currentHealth.ReadOnly = true;
             this.txtbx_currentHealth.Size = new System.Drawing.Size(23, 20);
             this.txtbx_currentHealth.TabIndex = 0;
-            // 
-            // form1BindingSource
-            // 
-            this.form1BindingSource.DataSource = typeof(PROFridge.Form1);
             // 
             // label1
             // 
@@ -129,7 +127,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(252, 374);
+            this.label2.Location = new System.Drawing.Point(177, 376);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(75, 13);
             this.label2.TabIndex = 9;
@@ -138,7 +136,7 @@
             // txtbx_xPos
             // 
             this.txtbx_xPos.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.form1BindingSource, "XPos", true));
-            this.txtbx_xPos.Location = new System.Drawing.Point(243, 390);
+            this.txtbx_xPos.Location = new System.Drawing.Point(168, 392);
             this.txtbx_xPos.Name = "txtbx_xPos";
             this.txtbx_xPos.ReadOnly = true;
             this.txtbx_xPos.Size = new System.Drawing.Size(42, 20);
@@ -147,7 +145,7 @@
             // txtbx_yPos
             // 
             this.txtbx_yPos.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.form1BindingSource, "YPos", true));
-            this.txtbx_yPos.Location = new System.Drawing.Point(305, 390);
+            this.txtbx_yPos.Location = new System.Drawing.Point(230, 392);
             this.txtbx_yPos.Name = "txtbx_yPos";
             this.txtbx_yPos.ReadOnly = true;
             this.txtbx_yPos.Size = new System.Drawing.Size(41, 20);
@@ -156,7 +154,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(229, 393);
+            this.label5.Location = new System.Drawing.Point(154, 395);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(14, 13);
             this.label5.TabIndex = 12;
@@ -165,7 +163,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(291, 393);
+            this.label6.Location = new System.Drawing.Point(216, 395);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(14, 13);
             this.label6.TabIndex = 13;
@@ -174,7 +172,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(8, 395);
+            this.label7.Location = new System.Drawing.Point(436, 69);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(41, 13);
             this.label7.TabIndex = 15;
@@ -183,7 +181,7 @@
             // txtbx_pokeDollar
             // 
             this.txtbx_pokeDollar.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.form1BindingSource, "PokeDollars", true));
-            this.txtbx_pokeDollar.Location = new System.Drawing.Point(52, 392);
+            this.txtbx_pokeDollar.Location = new System.Drawing.Point(480, 66);
             this.txtbx_pokeDollar.Name = "txtbx_pokeDollar";
             this.txtbx_pokeDollar.ReadOnly = true;
             this.txtbx_pokeDollar.Size = new System.Drawing.Size(82, 20);
@@ -373,7 +371,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(226, 335);
+            this.button1.Location = new System.Drawing.Point(178, 335);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(90, 31);
             this.button1.TabIndex = 37;
@@ -383,19 +381,45 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(322, 335);
+            this.button2.Location = new System.Drawing.Point(274, 335);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(54, 31);
+            this.button2.Size = new System.Drawing.Size(71, 31);
             this.button2.TabIndex = 38;
-            this.button2.Text = "STOP";
+            this.button2.Text = "Save Path";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(102, 335);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(70, 31);
+            this.button3.TabIndex = 39;
+            this.button3.Text = "Load Path";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(291, 374);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(54, 41);
+            this.button4.TabIndex = 40;
+            this.button4.Text = "Test Path";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // form1BindingSource
+            // 
+            this.form1BindingSource.DataSource = typeof(PROFridge.Form1);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(583, 425);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label15);
@@ -478,6 +502,8 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
     }
 }
 
