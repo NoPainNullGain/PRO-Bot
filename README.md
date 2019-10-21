@@ -1,9 +1,7 @@
 # Pokemon Revolution Online Bot
+ Farming + Leveling bot for the game Pokemon Revolution Online
  
  ![blog-2](https://user-images.githubusercontent.com/5794831/67248155-cbd22f80-f463-11e9-82c1-9a92ece3cb13.jpg)
- 
- 
- Farming + Leveling bot for the game Pokemon Revolution Online
  
  
  that includes
