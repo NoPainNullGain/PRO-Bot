@@ -66,7 +66,7 @@ namespace PROFridge
         public float SnapshotCurrentPositionX;
         public float SnapshotCurrentPositionY;
         public int coordinateID = 0;
-        public string recordedPathFile = @"C:\Users\Michael Kjergaard\Desktop\dummyFile.txt";
+        public string recordedPathFile = @"C:\Users\kjerg\Documents\stuff\PRO\CoordinatSaves\coordinates.txt";
         public bool FinishedRecording = true;
         public bool reversePath = true;
 
@@ -133,30 +133,31 @@ namespace PROFridge
         {
             if (openProc)
             {
-                CurrentHealth = m.readInt("GameAssembly.dll+00A427F8,0xB8,0x0,0x158,0x1A8,0x38");
+                CurrentHealth = m.readInt("GameAssembly.dll+00E4FAB8,0xB8,0x0,0x1C8,0x10,0x28,0x148");
                 txtbx_currentHealth.Text = CurrentHealth.ToString();
 
-                EnemyCurrentHealth = m.readInt("GameAssembly.dll+00A42B10,0x50,0x40,0x48,0xB8,0x0,0xA04");
+                EnemyCurrentHealth = m.readInt("GameAssembly.dll+00E4AD48,0x208,0xB40,0x18,0x138,0x50,0xA24");
                 txtbx_enemyCurrentHealth.Text = EnemyCurrentHealth.ToString();
 
-                IsFight = m.readInt("GameAssembly.dll+00A68178,0x210,0x528,0x548,0x88,0x768");
+                IsFight = m.readInt("GameAssembly.dll+00E50690,0xB8,0x20,0x2E8,0x50,0x678");
                 txtbx_fightState.Text = IsFight.ToString();
 
-                EncounterPokeIndex = m.readInt("UnityPlayer.dll+014B8980,0x48,0x118,0x138,0x60,0x138,0x9FC");
+                EncounterPokeIndex = m.readInt("GameAssembly.dll+00E474B0,0x4B0,0x10,0xE0,0x50,0x10,0xA1c");
                 txtbx_pokemonID.Text = EncounterPokeIndex.ToString();
 
-                PokeDollars = m.readInt("GameAssembly.dll+00A508B0,0xB8,0x48,0xB8,0x298,0x290");
-                txtbx_pokeDollar.Text = PokeDollars.ToString();
+                //PokeDollars = m.readInt("GameAssembly.dll+00A508B0,0xB8,0x48,0xB8,0x298,0x290");
+                //txtbx_pokeDollar.Text = PokeDollars.ToString();
 
-                XPos = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x21C");
-                txtbx_xPos.Text = XPos.ToString();
+                XPos = m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB0");
+                txtbx_xPos.Text = Math.Round(XPos).ToString();
 
-                YPos = m.readFloat("GameAssembly.dll+00A427F8,0x48,0xB8,0x0,0x220");
-                txtbx_yPos.Text = YPos.ToString();
+                
+                YPos = m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB4");
+                txtbx_yPos.Text = Math.Round(YPos).ToString();
 
                 txtbx_currentPP1.Text = AbilityPP1.ToString();
 
-                await Task.Delay(10);
+                await Task.Delay(100);
 
                 OnTickMemoryRead();
 
