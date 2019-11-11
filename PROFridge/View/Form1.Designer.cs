@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.txtbx_currentHealth = new System.Windows.Forms.TextBox();
+            this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtbx_pokemonID = new System.Windows.Forms.TextBox();
@@ -66,7 +67,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
-            this.form1BindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.form1BindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -78,6 +79,10 @@
             this.txtbx_currentHealth.ReadOnly = true;
             this.txtbx_currentHealth.Size = new System.Drawing.Size(23, 20);
             this.txtbx_currentHealth.TabIndex = 0;
+            // 
+            // form1BindingSource
+            // 
+            this.form1BindingSource.DataSource = typeof(PROFridge.Form1);
             // 
             // label1
             // 
@@ -409,15 +414,23 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // form1BindingSource
+            // checkBox1
             // 
-            this.form1BindingSource.DataSource = typeof(PROFridge.Form1);
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(13, 396);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(106, 17);
+            this.checkBox1.TabIndex = 41;
+            this.checkBox1.Text = "Overlay ON/OFF";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(583, 425);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -504,6 +517,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

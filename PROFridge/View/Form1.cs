@@ -20,12 +20,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PROFridge.Annotations;
 using PROFridge.Properties;
+using PROFridge.View;
 using PROFridge.ViewModel.HelperClasses;
 
 namespace PROFridge
 {
     public partial class Form1 : Form, INotifyPropertyChanged
     {
+        FormOverlay frm = new FormOverlay();
+
         public Form1()
         {
             InitializeComponent();
@@ -805,6 +808,18 @@ namespace PROFridge
                     writer.Write(result);
                     Debug.WriteLine(result, "Writing coords to JSON");
                 }
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked = true)
+            {
+                frm.Show();
+            }
+            else
+            {
+                frm.Hide();
             }
         }
     }
