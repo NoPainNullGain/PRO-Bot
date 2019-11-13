@@ -525,6 +525,8 @@ namespace PROFridge
 
         private void button4_Click(object sender, EventArgs e)
         {
+
+            frm.Show();
             HealPokecenter();
         }
 
@@ -598,11 +600,12 @@ namespace PROFridge
                     CoordX = XPos,
                     CoordY = YPos,
                     CoordXLast = XPos - 1,
-                    CoordYLast = YPos - 1
+                    CoordYLast = YPos + 1
                 };
 
                 singleton.XYList.Add(coordinates);
-                Debug.WriteLine(coordinates.CoordX.ToString(), coordinates.CoordY.ToString(), "Adding coords to empty list");
+                Debug.WriteLine("Adding coords to empty list " + "X:" + coordinates.CoordX + " Y:" + coordinates.CoordY);
+
 
             }
 
@@ -614,11 +617,11 @@ namespace PROFridge
                     CoordX = XPos,
                     CoordY = YPos,
                     CoordXLast = XPos - 1,
-                    CoordYLast = YPos - 1
+                    CoordYLast = YPos + 1
                 };
 
                 singleton.XYList.Add(coordinates);
-                Debug.WriteLine(coordinates.CoordX.ToString(), coordinates.CoordY.ToString(), "Adding coords to list");
+                Debug.WriteLine("Adding coords to list " + "X:" + coordinates.CoordX + " Y:" + coordinates.CoordY);
 
 
             }

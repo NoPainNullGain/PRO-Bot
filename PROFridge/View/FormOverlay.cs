@@ -61,11 +61,6 @@ namespace PROFridge.View
         {
             XYList = singleton.XYList;
 
-            float currentXCoord = singleton.XYList.Last().CoordX;
-            float currentYCoord = singleton.XYList.Last().CoordY;
-
-            float secondLastXCoord = singleton.XYList.Last().CoordX - 1;
-            float secondLastYCoord = singleton.XYList.Last().CoordY - 1;
 
 
 
@@ -89,15 +84,22 @@ namespace PROFridge.View
         private void FormOverlay_Paint(object sender, PaintEventArgs e)
         {
             g = e.Graphics;
+            foreach (var coordinatese in XYList)
+            {
+                var xPos = coordinatese.CoordX;
+                var yPos = coordinatese.CoordY;
+                var xPosLast = coordinatese.CoordXLast;
+                var yPosLast = coordinatese.CoordYLast;
 
+                g.DrawLine(pen, xPosLast, yPosLast, xPos, yPos);
+            }
 
 
             var points = new List<PointF>
             {
                 new PointF(0, 0),
                 new PointF(50, 50),
-                new PointF(100, 100),
-                new PointF(250, 250)
+
             };
 
 
@@ -107,8 +109,6 @@ namespace PROFridge.View
 
             }
 
-            g.DrawLine(pen, 100, 100, 200, 200);
-            //}
         }
     }
 }
