@@ -12,5 +12,9 @@ namespace PROFridge.ViewModel.HelperClasses
         public int Id { get; set; }
         public float CoordX { get; set; }
         public float CoordY { get; set; }
+        public float CoordXLast { get; set; }
+        public float CoordYLast { get; set; }
+
+
     }
 }

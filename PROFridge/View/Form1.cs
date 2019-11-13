@@ -37,7 +37,9 @@ namespace PROFridge
             {
                 Id = -9,
                 CoordX = -9,
-                CoordY = -9
+                CoordY = -9,
+                CoordXLast = -9,
+                CoordYLast = -9
             };
 
         }
@@ -77,7 +79,6 @@ namespace PROFridge
 
         public List<Coordinates> ReversedCoordList;
         public Coordinates coordinates;
-        public List<Coordinates> xy_List = new List<Coordinates>();
         public List<Coordinates> coordListFromJson;
 
         public Mem m = new Mem();
@@ -85,12 +86,13 @@ namespace PROFridge
         InputSimulator sim = new InputSimulator();
 
         public RamGecTools.KeyboardHook KeyboardHook = new RamGecTools.KeyboardHook();
+        public Singleton singleton = Singleton.Instance;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             KeyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(KeyboardHook_KeyDown);
             KeyboardHook.Install();
-
+            
             // Get Process ID
             int pID = m.getProcIDFromName("PROClient");
 
@@ -151,12 +153,12 @@ namespace PROFridge
                 //PokeDollars = m.readInt("GameAssembly.dll+00A508B0,0xB8,0x48,0xB8,0x298,0x290");
                 //txtbx_pokeDollar.Text = PokeDollars.ToString();
 
-                XPos = m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB0");
-                txtbx_xPos.Text = Math.Round(XPos).ToString();
+                XPos = Convert.ToInt32(Math.Ceiling(m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB0")));
+                txtbx_xPos.Text = XPos.ToString();
 
                 
-                YPos = m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB4");
-                txtbx_yPos.Text = Math.Round(YPos).ToString();
+                YPos = Convert.ToInt32(Math.Ceiling(m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB4")));
+                txtbx_yPos.Text = YPos.ToString();
 
                 txtbx_currentPP1.Text = AbilityPP1.ToString();
 
@@ -583,45 +585,45 @@ namespace PROFridge
 
         public async void RecordPath()
         {
-            // TODO
-            // Muligvis omkskrive RecordPath til istedet for xy, xy, xy, xy coordinater så x, y, x, y, x, y, x, y
-            // Så der kun optages coords når de ændres og derved danner man en linje botten kan følge
 
-            // Anden mulighed som i nuværende recordPath xy, xy, xy, xy, xy. få botten til kun at følge det coord som ændre sig og derved lave en linge der kan følge. 
 
             FinishedRecording = false;
             SnapshotCoords();
 
-            if (XYList.Count == 0)
+            if (singleton.XYList.Count == 0)
             {
                 coordinates = new Coordinates
                 {
                     Id = ++coordinateID,
                     CoordX = XPos,
-                    CoordY = YPos
+                    CoordY = YPos,
+                    CoordXLast = XPos - 1,
+                    CoordYLast = YPos - 1
                 };
 
-                XYList.Add(coordinates);
-                Debug.WriteLine(coordinates, "Adding coords to empty list");
+                singleton.XYList.Add(coordinates);
+                Debug.WriteLine(coordinates.CoordX.ToString(), coordinates.CoordY.ToString(), "Adding coords to empty list");
 
             }
 
-            if (XYList.Last().CoordX != SnapshotCurrentPositionX || XYList.Last().CoordY != SnapshotCurrentPositionY)
+            if (singleton.XYList.Last().CoordX != SnapshotCurrentPositionX || singleton.XYList.Last().CoordY != SnapshotCurrentPositionY)
             {
                 coordinates = new Coordinates
                 {
                     Id = ++coordinateID,
                     CoordX = XPos,
-                    CoordY = YPos
+                    CoordY = YPos,
+                    CoordXLast = XPos - 1,
+                    CoordYLast = YPos - 1
                 };
 
-                XYList.Add(coordinates);
-                Debug.WriteLine(coordinates, "Adding coords to list");
+                singleton.XYList.Add(coordinates);
+                Debug.WriteLine(coordinates.CoordX.ToString(), coordinates.CoordY.ToString(), "Adding coords to list");
 
 
             }
 
-
+            frm.Show();
             await Task.Delay(100);
             RecordPath();
         }
@@ -770,11 +772,6 @@ namespace PROFridge
             set { _farmSpecifPokeID = value; }
         }
 
-        public List<Coordinates> XYList
-        {
-            get { return xy_List; }
-            set { xy_List = value; }
-        }
 
 
         #region OnPropChange
@@ -801,7 +798,7 @@ namespace PROFridge
 
             if (FinishedRecording)
             {
-                string result = JsonConvert.SerializeObject(XYList, Formatting.Indented);
+                string result = JsonConvert.SerializeObject(singleton.XYList, Formatting.Indented);
 
                 using (var writer = new StreamWriter(recordedPathFile))
                 {
@@ -813,14 +810,7 @@ namespace PROFridge
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked = true)
-            {
-                frm.Show();
-            }
-            else
-            {
-                frm.Hide();
-            }
+
         }
     }
 }

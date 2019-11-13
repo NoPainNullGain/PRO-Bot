@@ -65,6 +65,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Singleton.cs" />
     <Compile Include="ViewModel\HelperClasses\KeyboardHook.cs" />
     <Compile Include="View\Form1.cs">
       <SubType>Form</SubType>
