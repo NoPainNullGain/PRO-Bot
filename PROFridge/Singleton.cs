@@ -12,13 +12,14 @@ namespace PROFridge
         private static Singleton _instance = null;
 
         public List<Coordinates> xy_List = new List<Coordinates>();
-
+        //public Form1 form1 = new Form1(); 
+        public bool IsSaved = false;
+        
         private Singleton()
         {
 
-
         }
-
+        
         public List<Coordinates> XYList
         {
             get { return xy_List; }

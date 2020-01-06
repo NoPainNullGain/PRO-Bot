@@ -7,6 +7,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,14 +22,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PROFridge.Annotations;
 using PROFridge.Properties;
-using PROFridge.View;
 using PROFridge.ViewModel.HelperClasses;
+using PokeApiNet;
+using PROFridge.Model;
+using System.Web;
 
 namespace PROFridge
 {
     public partial class Form1 : Form, INotifyPropertyChanged
     {
-        FormOverlay frm = new FormOverlay();
 
         public Form1()
         {
@@ -71,17 +74,18 @@ namespace PROFridge
         public float SnapshotCurrentPositionX;
         public float SnapshotCurrentPositionY;
         public int coordinateID = 0;
-        public string recordedPathFile = @"C:\Users\kjerg\Documents\stuff\PRO\CoordinatSaves\coordinates.txt";
+        public string recordedPathFile = @"C:\Users\kjerg\Desktop\PRO\CoordinatSaves\coordinates.txt";
         public bool FinishedRecording = true;
         public bool reversePath = true;
 
-
+        public static string URL = "http://pokeapi.co/api/v2/pokemon/";
 
         public List<Coordinates> ReversedCoordList;
         public Coordinates coordinates;
         public List<Coordinates> coordListFromJson;
 
         public Mem m = new Mem();
+        Pokemon p = new Pokemon();
 
         InputSimulator sim = new InputSimulator();
 
@@ -92,7 +96,7 @@ namespace PROFridge
         {
             KeyboardHook.KeyDown += new RamGecTools.KeyboardHook.KeyboardHookCallback(KeyboardHook_KeyDown);
             KeyboardHook.Install();
-            
+
             // Get Process ID
             int pID = m.getProcIDFromName("PROClient");
 
@@ -104,7 +108,7 @@ namespace PROFridge
                 m.OpenProcess(pID);
                 openProc = true;
             }
-
+            
 
             OnTickMemoryRead();
 
@@ -141,23 +145,23 @@ namespace PROFridge
                 CurrentHealth = m.readInt("GameAssembly.dll+00E4FAB8,0xB8,0x0,0x1C8,0x10,0x28,0x148");
                 txtbx_currentHealth.Text = CurrentHealth.ToString();
 
-                EnemyCurrentHealth = m.readInt("GameAssembly.dll+00E4AD48,0x208,0xB40,0x18,0x138,0x50,0xA24");
+                EnemyCurrentHealth = m.readInt("GameAssembly.dll+00C2BE60,0x78,0x70,0x20,0x10,0xA2C");
                 txtbx_enemyCurrentHealth.Text = EnemyCurrentHealth.ToString();
 
-                IsFight = m.readInt("GameAssembly.dll+00E50690,0xB8,0x20,0x2E8,0x50,0x678");
+                IsFight = m.readInt("GameAssembly.dll+00E4EE78,0xB8,0x0,0x950,0xE8,0x228");
                 txtbx_fightState.Text = IsFight.ToString();
 
-                EncounterPokeIndex = m.readInt("GameAssembly.dll+00E474B0,0x4B0,0x10,0xE0,0x50,0x10,0xA1c");
+                EncounterPokeIndex = m.readInt("GameAssembly.dll+00E4B510,0xB8,0x20,0x98,0x38,0xA24");
                 txtbx_pokemonID.Text = EncounterPokeIndex.ToString();
 
                 //PokeDollars = m.readInt("GameAssembly.dll+00A508B0,0xB8,0x48,0xB8,0x298,0x290");
                 //txtbx_pokeDollar.Text = PokeDollars.ToString();
 
-                XPos = Convert.ToInt32(Math.Ceiling(m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB0")));
+                XPos = (int)Math.Ceiling(m.readFloat("UnityPlayer.dll+015F5600,0xB8,0x18,0x18,0xE0,0x90"));
                 txtbx_xPos.Text = XPos.ToString();
 
-                
-                YPos = Convert.ToInt32(Math.Ceiling(m.readFloat("UnityPlayer.dll+01641E38,0x180,0x58,0x128,0x38,0xB4")));
+
+                YPos = (int)Math.Abs(Math.Ceiling(m.readFloat("GameAssembly.dll+00E5B690,0x90,0x28,0xB8,0x20,0x278,0x230")));
                 txtbx_yPos.Text = YPos.ToString();
 
                 txtbx_currentPP1.Text = AbilityPP1.ToString();
@@ -167,6 +171,7 @@ namespace PROFridge
                 OnTickMemoryRead();
 
             }
+
         }
 
 
@@ -246,7 +251,7 @@ namespace PROFridge
         // Fight logic
         public void FightLogic()
         {
-            if (IsFight == 7 && startBot) // && AbilityPP1 > 0)
+            if (IsFight == 13 && startBot) // && AbilityPP1 > 0)
             {
                 txtbx_status.Text = Status = "Lets Fight";
 
@@ -330,7 +335,6 @@ namespace PROFridge
 
         }
 
-
         public void HealPokecenter()
         {
             //TODO
@@ -338,7 +342,7 @@ namespace PROFridge
 
             MoveOnPath();
 
-            // Interact();
+            Interact();
 
             // reversePath = false;
 
@@ -359,7 +363,7 @@ namespace PROFridge
 
                 for (int i = 0; i < ReversedCoordList.Count; i++)
                 {
-                    if (i>0 && (ReversedCoordList[i].CoordX > ReversedCoordList[i - 1].CoordX + 3 || ReversedCoordList[i].CoordX < ReversedCoordList[i - 1].CoordX - 3 || ReversedCoordList[i].CoordY > ReversedCoordList[i - 1].CoordY + 3 || ReversedCoordList[i].CoordY < ReversedCoordList[i - 1].CoordY - 3))
+                    if (i > 0 && (ReversedCoordList[i].CoordX > ReversedCoordList[i - 1].CoordX + 3 || ReversedCoordList[i].CoordX < ReversedCoordList[i - 1].CoordX - 3 || ReversedCoordList[i].CoordY > ReversedCoordList[i - 1].CoordY + 3 || ReversedCoordList[i].CoordY < ReversedCoordList[i - 1].CoordY - 3))
                     {
                         if (ReversedCoordList[i].CoordX > ReversedCoordList[i - 1].CoordX + 3)
                         {
@@ -406,13 +410,13 @@ namespace PROFridge
 
                             while (YPos > ReversedCoordList[i].CoordY)
                             {
-                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
                                 await Task.Delay(50);
                             }
 
                             while (YPos < ReversedCoordList[i].CoordY)
                             {
-                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
                                 await Task.Delay(50);
                             }
                         }
@@ -471,13 +475,13 @@ namespace PROFridge
 
                             while (YPos > coordListFromJson[i].CoordY)
                             {
-                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
                                 await Task.Delay(50);
                             }
 
                             while (YPos < coordListFromJson[i].CoordY)
                             {
-                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_W);
+                                sim.Keyboard.KeyPress(VirtualKeyCode.VK_S);
                                 await Task.Delay(50);
                             }
                         }
@@ -526,7 +530,6 @@ namespace PROFridge
         private void button4_Click(object sender, EventArgs e)
         {
 
-            frm.Show();
             HealPokecenter();
         }
 
@@ -600,7 +603,7 @@ namespace PROFridge
                     CoordX = XPos,
                     CoordY = YPos,
                     CoordXLast = XPos - 1,
-                    CoordYLast = YPos + 1
+                    CoordYLast = YPos - 1
                 };
 
                 singleton.XYList.Add(coordinates);
@@ -617,7 +620,7 @@ namespace PROFridge
                     CoordX = XPos,
                     CoordY = YPos,
                     CoordXLast = XPos - 1,
-                    CoordYLast = YPos + 1
+                    CoordYLast = YPos - 1
                 };
 
                 singleton.XYList.Add(coordinates);
@@ -626,7 +629,6 @@ namespace PROFridge
 
             }
 
-            frm.Show();
             await Task.Delay(100);
             RecordPath();
         }
@@ -701,6 +703,29 @@ namespace PROFridge
             }
 
             return id.ToString();
+        }
+
+
+
+        public async Task<Pokemon> GetPokemonAsync()
+
+        {
+            string page = URL;
+            Pokemon a = new Pokemon();
+
+
+            using (HttpClient client = new HttpClient())
+            using (HttpResponseMessage response = await client.GetAsync(page))
+            using (HttpContent content = response.Content)
+            {
+                string result = await content.ReadAsStringAsync();
+
+                Console.WriteLine(result.Substring(0, 200));
+                a = JsonConvert.DeserializeObject<Pokemon>(result);
+
+            }
+
+            return a;
         }
 
         public int CurrentHealth
@@ -792,11 +817,13 @@ namespace PROFridge
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            singleton.IsSaved = true;
             RecordPath();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            singleton.IsSaved = false;
             FinishedRecording = true;
 
             if (FinishedRecording)
